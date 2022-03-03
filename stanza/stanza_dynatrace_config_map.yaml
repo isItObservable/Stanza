@@ -1,0 +1,26 @@
+kind: ConfigMap
+metadata:
+  name: stanza-config
+  namespace: default
+apiVersion: v1
+data:
+  CLUSTER_ID: "CLUSTER_ID_TO_REPLACE"
+  config.yaml: |2-
+    pipeline:
+      - type: kubernetes_container
+        cluster_name: isitobservable
+        # avoid parsing stanza's log output
+        exclude:
+          - /var/log/containers/stanza-*_*-*.log
+        start_at: end
+
+
+
+      - type: rate_limit
+        rate: 500
+
+      # watch stanza's output with 'kubectl logs -f <pod name> | jq .'
+      - type: dynatrace_output
+        cluster_id : 'CLUSTER_ID_TO_REPLACE'
+        base_uri : https://stanza-activegate.dynatrace.svc.cluster.local:9999/e/ENVIRONMENT_ID_TO_REPLACE/api/v2/logs/ingest
+        api_key : 'API_TOKEN_TO_REPLACE'
